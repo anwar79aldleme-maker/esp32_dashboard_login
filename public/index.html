@@ -6,6 +6,7 @@
 <title>ESP32 Cyber Dashboard</title>
 
 <style>
+  
 body, html { margin:0; padding:0; font-family:"Segoe UI", sans-serif; transition: background 0.4s, color 0.4s;}
 body.dark { background:#0a0f1a; color:#e0e0e0; }
 body.light { background:#e0f7fa; color:#004d40; }
@@ -54,6 +55,11 @@ canvas { width:100% !important; height:220px !important; }
     <p id="lastReading">Waiting for data...</p>
   </div>
 </div>
+<script>
+if (!localStorage.getItem("authToken")) {
+  window.location.href = "/login.html";
+}
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
