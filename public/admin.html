@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  background:#0a0f1a;
+  color:#00ffff;
+  font-family:Arial;
+  padding:20px;
+}
+h2{ text-align:center; }
+
+input, button{
+  padding:8px;
+  margin:5px;
+}
+button{
+  background:#00ffff;
+  border:none;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:20px;
+}
+th, td{
+  border:1px solid #00ffff55;
+  padding:8px;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+<h2>⚙️ Admin – Sensor Data</h2>
+
+<!-- ADD -->
+<h3>Add New Reading</h3>
+<input id="hr" type="number" placeholder="Heart Rate">
+<input id="spo" type="number" placeholder="SpO₂">
+<button onclick="addData()">Add</button>
+
+<!-- SEARCH -->
+<h3>Search</h3>
+<input id="search" placeholder="Search HR or SpO2">
+<button onclick="loadData()">Search</button>
+
+<table>
+<thead>
+<tr>
+<th>ID</th><th>HR</th><th>SpO₂</th><th>Time</th><th>Actions</th>
+</tr>
+</thead>
+<tbody id="rows"></tbody>
+</table>
+
+<script src="/auth.js"></script>
+<script>
+async function loadData(){
+  const q = search.value;
+  const res = await fetch('/api/admin?q='+q);
+  const data = await res.json();
+  rows.innerHTML = '';
+  data.forEach(r=>{
+    rows.innerHTML += `
+      <tr>
+        <td>${r.id}</td>
+        <td><input value="${r.heartrate}" onchange="update(${r.id}, this.value, null)"></td>
+        <td><input value="${r.spo2}" onchange="update(${r.id}, null, this.value)"></td>
+        <td>${new Date(r.time).toLocaleString()}</td>
+        <td><button onclick="del(${r.id})">❌</button></td>
+      </tr>`;
+  });
+}
+
+async function addData(){
+  await fetch('/api/admin',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({heartrate:+hr.value, spo2:+spo.value})
+  });
+  loadData();
+}
+
+async function update(id, hr, spo){
+  await fetch('/api/admin',{
+    method:'PUT',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({id, heartrate:hr, spo2:spo})
+  });
+}
+
+async function del(id){
+  await fetch('/api/admin',{
+    method:'DELETE',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({id})
+  });
+  loadData();
+}
+
+loadData();
+</script>
+</body>
+</html>
