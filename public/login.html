@@ -61,6 +61,7 @@ async function login() {
   if (data.success) {
     localStorage.setItem("authToken", data.token);
     window.location.href = "/";
+    localStorage.setItem('auth','1');
   } else {
     document.getElementById("error").innerText = "Invalid login";
   }
